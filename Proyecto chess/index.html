@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecciones de Ajedrez</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,440;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F2E7;
+  --walnut:#6B4226;
+  --walnut-deep:#4A2C18;
+  --ink:#2A211A;
+  --ink-soft:#6b5c4d;
+  --brass:#A9812F;
+  --brass-soft:#C9A85C;
+  --card-bg:#FFFFFF;
+  --card-border:#E4D9C2;
+  --felt:#24352B;
+  --felt-soft:#33473B;
+  --felt-ink:#F1EAD9;
+  --shadow: rgba(42,33,26,0.14);
+  --danger:#8C3B2E;
+  --danger-bg:#F6E6E1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#18120C;
+    --walnut:#D8B36A;
+    --walnut-deep:#EEDFC2;
+    --ink:#F1E9DA;
+    --ink-soft:#bba98d;
+    --brass:#D8B36A;
+    --brass-soft:#B58F3F;
+    --card-bg:#241C14;
+    --card-border:#3A2E20;
+    --felt:#0F1B14;
+    --felt-soft:#1B2A20;
+    --felt-ink:#EFE7D6;
+    --shadow: rgba(0,0,0,0.45);
+    --danger:#E7A08F;
+    --danger-bg:#3A241F;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#18120C;
+  --walnut:#D8B36A;
+  --walnut-deep:#EEDFC2;
+  --ink:#F1E9DA;
+  --ink-soft:#bba98d;
+  --brass:#D8B36A;
+  --brass-soft:#B58F3F;
+  --card-bg:#241C14;
+  --card-border:#3A2E20;
+  --felt:#0F1B14;
+  --felt-soft:#1B2A20;
+  --felt-ink:#EFE7D6;
+  --shadow: rgba(0,0,0,0.45);
+  --danger:#E7A08F;
+  --danger-bg:#3A241F;
+}
+
+*{box-sizing:border-box;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Public Sans", -apple-system, sans-serif;
+  line-height:1.5;
+}
+
+h1,h2{
+  font-family:"Fraunces", Georgia, serif;
+  margin:0;
+}
+
+button{ font-family:inherit; }
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  background:var(--felt);
+  color:var(--felt-ink);
+  padding:1.25rem 1.5rem;
+}
+.brand{
+  display:flex; align-items:center; gap:0.85rem; min-width:0;
+  cursor:pointer;
+  border-radius:6px;
+  transition:opacity 0.15s ease;
+}
+.brand:hover{ opacity:0.85; }
+.brand:focus-visible{ outline:2px solid var(--brass-soft); outline-offset:4px; }
+.brand-mark{
+  font-size:2.1rem;
+  color:var(--brass-soft);
+  line-height:1;
+  flex-shrink:0;
+}
+.brand h1{ font-size:1.5rem; font-weight:600; color:var(--felt-ink); }
+.tagline{
+  margin:0.15rem 0 0;
+  font-size:0.9rem;
+  font-style:italic;
+  font-family:"Fraunces", serif;
+  color:var(--brass-soft);
+}
+
+.icon-btn{
+  width:2.5rem; height:2.5rem;
+  border-radius:50%;
+  border:1px solid rgba(241,234,217,0.3);
+  background:transparent;
+  color:var(--felt-ink);
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:background 0.15s ease, border-color 0.15s ease;
+}
+.icon-btn:hover{ background:rgba(241,234,217,0.12); border-color:rgba(241,234,217,0.55); }
+.icon-btn:focus-visible{ outline:2px solid var(--brass-soft); outline-offset:2px; }
+
+.level-tabs{
+  display:flex;
+  gap:0.25rem;
+  overflow-x:auto;
+  padding:0.75rem 1.5rem;
+  background:var(--felt-soft);
+  border-bottom:1px solid rgba(241,234,217,0.12);
+}
+.level-tab{
+  display:flex; align-items:center; gap:0.5rem;
+  background:transparent;
+  border:none;
+  border-bottom:2px solid transparent;
+  color:rgba(241,234,217,0.7);
+  padding:0.55rem 0.9rem;
+  cursor:pointer;
+  font-size:0.95rem;
+  white-space:nowrap;
+  transition:color 0.15s ease, border-color 0.15s ease;
+}
+.level-tab:hover{ color:var(--felt-ink); }
+.level-tab.active{ color:var(--felt-ink); border-bottom-color:var(--brass-soft); }
+.level-tab:focus-visible{ outline:2px solid var(--brass-soft); outline-offset:2px; }
+.level-icon{ color:var(--brass-soft); font-size:1.1rem; }
+.level-count{
+  font-size:0.75rem;
+  background:rgba(241,234,217,0.15);
+  border-radius:999px;
+  padding:0.05rem 0.5rem;
+}
+
+main{ padding:1.75rem 1.5rem 3rem; max-width:1180px; margin:0 auto; }
+
+.video-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+  gap:1.5rem;
+}
+
+.lesson-section{ margin-bottom:2.25rem; }
+.lesson-section:last-child{ margin-bottom:0; }
+.lesson-title{
+  font-size:1.05rem;
+  font-weight:600;
+  font-family:"Fraunces", serif;
+  color:var(--walnut);
+  margin:0 0 0.9rem;
+  padding-bottom:0.4rem;
+  border-bottom:1px solid var(--card-border);
+}
+.lesson-empty{
+  color:var(--ink-soft);
+  font-size:0.9rem;
+  margin:0 0 0.5rem;
+}
+
+.video-card{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  text-align:left;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:6px;
+  overflow:hidden;
+  cursor:pointer;
+  padding:0;
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+}
+.video-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px var(--shadow); }
+.video-card:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
+
+.thumb-wrap{
+  position:relative;
+  aspect-ratio:16/9;
+  background:var(--felt);
+  display:block;
+}
+.thumb-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+.thumb-fallback{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem;
+  color:var(--brass-soft);
+}
+.play-badge{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff;
+  font-size:0.9rem;
+  background:radial-gradient(circle, rgba(36,53,43,0.55) 0%, rgba(36,53,43,0) 62%);
+}
+.play-badge::before{
+  content:'';
+  position:absolute;
+  width:2.6rem; height:2.6rem;
+  border-radius:50%;
+  background:rgba(36,53,43,0.72);
+}
+.play-badge::after{
+  content:'▶';
+  position:relative;
+  color:var(--brass-soft);
+  font-size:0.95rem;
+  margin-left:3px;
+}
+.duration-badge{
+  position:absolute; right:0.5rem; bottom:0.5rem;
+  background:rgba(0,0,0,0.72);
+  color:#fff;
+  font-size:0.72rem;
+  padding:0.1rem 0.4rem;
+  border-radius:3px;
+}
+.video-title{
+  padding:0.75rem 0.9rem 0.95rem;
+  font-size:0.95rem;
+  color:var(--ink);
+}
+
+.state-msg{
+  padding:3rem 1rem;
+  text-align:center;
+  color:var(--ink-soft);
+  font-size:1.02rem;
+}
+.state-msg p{ max-width:32rem; margin:0 auto 1rem; }
+.state-error p{ color:var(--danger); }
+.state-onboard{ padding-top:2rem; }
+
+.btn-primary{
+  background:var(--brass);
+  color:var(--felt);
+  border:none;
+  border-radius:999px;
+  padding:0.6rem 1.4rem;
+  font-size:0.95rem;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-primary:hover{ background:var(--brass-soft); }
+.btn-primary:focus-visible{ outline:2px solid var(--walnut-deep); outline-offset:2px; }
+.btn-ghost{
+  background:transparent;
+  color:var(--ink-soft);
+  border:1px solid var(--card-border);
+  border-radius:999px;
+  padding:0.6rem 1.3rem;
+  font-size:0.9rem;
+  cursor:pointer;
+}
+.btn-ghost:hover{ color:var(--ink); border-color:var(--walnut); }
+
+.modal-overlay{
+  position:fixed; inset:0;
+  background:rgba(24,18,12,0.68);
+  display:flex; align-items:center; justify-content:center;
+  padding:1.25rem;
+  z-index:50;
+}
+.modal{
+  background:var(--card-bg);
+  color:var(--ink);
+  border-radius:10px;
+  padding:1.75rem;
+  max-width:30rem;
+  width:100%;
+  max-height:88vh;
+  overflow-y:auto;
+}
+.modal h2{ font-size:1.3rem; margin-bottom:0.5rem; }
+.modal-help{ color:var(--ink-soft); font-size:0.92rem; margin:0 0 1.1rem; }
+.modal label{
+  display:block;
+  font-size:0.85rem;
+  font-weight:600;
+  margin-bottom:1rem;
+  color:var(--ink-soft);
+}
+.modal input{
+  display:block;
+  width:100%;
+  margin-top:0.35rem;
+  padding:0.6rem 0.75rem;
+  border-radius:5px;
+  border:1px solid var(--card-border);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:0.95rem;
+}
+.modal input:focus-visible{ outline:2px solid var(--brass); outline-offset:1px; }
+.settings-error{
+  color:var(--danger);
+  background:var(--danger-bg);
+  border-radius:5px;
+  padding:0.6rem 0.75rem;
+  font-size:0.88rem;
+  margin:-0.3rem 0 1rem;
+}
+details{
+  font-size:0.88rem;
+  color:var(--ink-soft);
+  margin-bottom:1.2rem;
+  border-top:1px solid var(--card-border);
+  padding-top:0.75rem;
+}
+details summary{ cursor:pointer; color:var(--walnut); font-weight:600; }
+details ol{ padding-left:1.15rem; margin:0.6rem 0 0; }
+details li{ margin-bottom:0.45rem; }
+
+.modal-actions{ display:flex; justify-content:flex-end; gap:0.6rem; }
+
+.player-view{
+  max-width:1180px;
+  margin:0 auto;
+  padding:1.1rem 1.5rem 3rem;
+}
+.video-modal-body{
+  display:flex;
+  align-items:flex-start;
+  gap:1.5rem;
+}
+.video-player-col{
+  flex:1 1 auto;
+  min-width:0;
+}
+.video-frame-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  border-radius:5px;
+  overflow:hidden;
+  background:#000;
+}
+.video-frame-wrap iframe{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  border:none;
+}
+.video-modal-title{
+  margin:0.9rem 0.1rem 0.15rem;
+  font-size:1.05rem;
+  color:var(--ink);
+}
+.video-open-link{
+  display:inline-flex;
+  align-items:center;
+  gap:0.3rem;
+  margin:0.35rem 0.1rem 0;
+  font-size:0.85rem;
+  color:var(--walnut);
+  text-decoration:none;
+}
+.video-open-link:hover{ color:var(--brass); text-decoration:underline; }
+.video-open-link:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
+
+.video-sidebar{
+  flex:0 0 320px;
+  position:sticky;
+  top:1.5rem;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:0.1rem;
+  padding-right:0.2rem;
+}
+.sidebar-lesson-label{
+  font-family:"Fraunces", serif;
+  font-size:0.78rem;
+  font-weight:600;
+  color:var(--walnut);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+  margin:0.85rem 0 0.35rem;
+}
+.sidebar-lesson-label:first-child{ margin-top:0.1rem; }
+.sidebar-item{
+  display:flex;
+  gap:0.6rem;
+  align-items:flex-start;
+  width:100%;
+  padding:0.35rem;
+  border-radius:5px;
+  border:none;
+  background:transparent;
+  color:var(--ink);
+  text-align:left;
+  cursor:pointer;
+}
+.sidebar-item:hover{ background:var(--card-bg); }
+.sidebar-item.active{ background:var(--card-bg); box-shadow:inset 2px 0 0 var(--brass); }
+.sidebar-item:focus-visible{ outline:2px solid var(--brass); outline-offset:1px; }
+.sidebar-thumb{
+  position:relative;
+  flex:0 0 100px;
+  aspect-ratio:16/9;
+  border-radius:4px;
+  overflow:hidden;
+  background:var(--felt);
+}
+.sidebar-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.sidebar-thumb-fallback{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--brass-soft);
+  font-size:1.05rem;
+}
+.sidebar-duration{
+  position:absolute; right:0.25rem; bottom:0.25rem;
+  background:rgba(0,0,0,0.72);
+  color:#fff;
+  font-size:0.6rem;
+  padding:0.02rem 0.3rem;
+  border-radius:3px;
+}
+.sidebar-info{ min-width:0; }
+.sidebar-title{
+  font-size:0.83rem;
+  line-height:1.3;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.sidebar-now{
+  display:block;
+  font-size:0.7rem;
+  color:var(--brass);
+  font-weight:600;
+  margin-top:0.15rem;
+}
+
+@media (max-width: 840px){
+  .video-modal-body{ flex-direction:column; align-items:stretch; }
+  .video-sidebar{ position:static; flex:0 0 auto; width:100%; max-height:none; }
+  .video-frame-wrap{ aspect-ratio:4/3; }
+}
+
+@media (max-width: 480px){
+  .topbar{ padding:1rem; gap:0.5rem; }
+  .brand{ gap:0.6rem; }
+  .brand-mark{ font-size:1.7rem; }
+  .brand h1{ font-size:1.15rem; }
+  .tagline{ font-size:0.78rem; }
+  .icon-btn{ width:2.75rem; height:2.75rem; }
+  .level-tabs{ padding:0.6rem 1rem; }
+  .level-tab{ padding:0.5rem 0.7rem; font-size:0.88rem; }
+  main{ padding:1.25rem 1rem 2.25rem; }
+  .video-grid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:0.85rem; }
+  .video-title{ padding:0.6rem 0.7rem 0.75rem; font-size:0.88rem; }
+  .modal{ padding:1.25rem; }
+  .player-view{ padding:1.1rem 1rem 2.25rem; }
+  .video-modal-body{ gap:0.75rem; }
+  .sidebar-thumb{ flex-basis:84px; }
+}
+
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand" id="homeBtn" role="button" tabindex="0" aria-label="Volver a la biblioteca">
+      <span class="brand-mark" aria-hidden="true">&#9822;</span>
+      <div>
+        <h1>Lecciones de Ajedrez</h1>
+        <p class="tagline">Biblioteca de video por nivel</p>
+      </div>
+    </div>
+    <button id="settingsBtn" class="icon-btn" aria-label="Configuración" title="Configuración" hidden>&#9881;</button>
+  </header>
+
+  <div id="libraryView">
+    <nav id="levelTabs" class="level-tabs" hidden></nav>
+    <main id="content"></main>
+  </div>
+
+  <section id="playerView" class="player-view" hidden>
+    <div class="video-modal-body">
+      <div class="video-player-col">
+        <div class="video-frame-wrap">
+          <iframe id="videoFrame" allow="autoplay" allowfullscreen title="Video de lección"></iframe>
+        </div>
+        <p id="videoTitle" class="video-modal-title"></p>
+        <a id="videoOpenLink" class="video-open-link" href="#" target="_blank" rel="noopener">Abrir en Google Drive &#8599;</a>
+      </div>
+      <aside class="video-sidebar" id="videoSidebar"></aside>
+    </div>
+  </section>
+</div>
+
+<div id="settingsModal" class="modal-overlay" hidden>
+  <div class="modal">
+    <h2>Configuración</h2>
+    <p class="modal-help">Necesitas una API key de Google Drive y el ID de la carpeta que contiene las subcarpetas de nivel (Principiante, Intermedio, Avanzado). Esto se guarda solo en este navegador.</p>
+    <p id="settingsError" class="settings-error" hidden></p>
+    <label>API key de Google
+      <input type="text" id="apiKeyInput" placeholder="AIza...">
+    </label>
+    <label>ID de la carpeta principal
+      <input type="text" id="folderIdInput" placeholder="1AbCdEfGhIjKlMnOpQrStUvWxYz">
+    </label>
+    <details>
+      <summary>¿Cómo consigo esto?</summary>
+      <ol>
+        <li>En <strong>Google Cloud Console</strong>, crea un proyecto (o usa uno existente) y habilita la <strong>Google Drive API</strong>.</li>
+        <li>En "Credenciales", crea una <strong>API key</strong>. Si vas a subir esta página a un sitio público, restríngela por dominio (HTTP referrer) para que nadie más la use.</li>
+        <li>En Google Drive, comparte la carpeta principal como <strong>"Cualquier persona con el enlace puede ver"</strong>. El permiso se hereda a las subcarpetas y videos de adentro, así que no hace falta compartir cada video por separado.</li>
+        <li>Copia el ID de la carpeta: es la parte final de su URL, después de <code>/folders/</code>.</li>
+      </ol>
+    </details>
+    <div class="modal-actions">
+      <button id="clearConfigBtn" class="btn-ghost">Borrar configuración</button>
+      <button id="saveConfigBtn" class="btn-primary">Guardar y cargar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ── Pon aquí tu API key y el ID de tu carpeta de Drive ──────────────
+  // Si los dejas así (vacíos), la página te va a pedir estos datos
+  // en pantalla, igual que antes.
+  // Aviso: al quedar en el código, cualquiera que vea el código fuente
+  // de este archivo (Ctrl+U / "Ver código fuente") puede leerlos. Está
+  // bien para uso personal o local; si subes este archivo a un sitio
+  // público, restringe la API key por dominio en Google Cloud Console.
+  const DEFAULT_API_KEY = 'AIzaSyDp_BDYxoY1xlYAdhswJx4AYmMpzB4Y2DQ';
+  const DEFAULT_FOLDER_ID = '1In2YpoyTufQhSyMqAwBJqQrppK_UlSp2';
+  // ─────────────────────────────────────────────────────────────────
+
+  const STORAGE_KEY = 'chess-drive-config-v1';
+  const LEVEL_ORDER = ['principiante','intermedio','avanzado'];
+  const LEVEL_ICONS = { principiante:'\u2659', intermedio:'\u2658', avanzado:'\u265B' };
+
+  const els = {
+    content: document.getElementById('content'),
+    tabs: document.getElementById('levelTabs'),
+    libraryView: document.getElementById('libraryView'),
+    playerView: document.getElementById('playerView'),
+    settingsBtn: document.getElementById('settingsBtn'),
+    settingsModal: document.getElementById('settingsModal'),
+    settingsError: document.getElementById('settingsError'),
+    apiKeyInput: document.getElementById('apiKeyInput'),
+    folderIdInput: document.getElementById('folderIdInput'),
+    saveConfigBtn: document.getElementById('saveConfigBtn'),
+    clearConfigBtn: document.getElementById('clearConfigBtn'),
+    homeBtn: document.getElementById('homeBtn'),
+    videoFrame: document.getElementById('videoFrame'),
+    videoTitle: document.getElementById('videoTitle'),
+    videoOpenLink: document.getElementById('videoOpenLink'),
+    videoSidebar: document.getElementById('videoSidebar'),
+  };
+
+  let state = { levels: [], activeIndex: 0 };
+  let currentPlaylist = [];
+  let currentVideoId = null;
+
+  function normalize(str){
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  }
+  function naturalCompare(a, b){
+    return a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' });
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function loadConfig(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+  function saveConfig(cfg){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); }catch(e){}
+  }
+  function clearConfig(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+
+  function openSettings(){
+    const cfg = loadConfig() || {};
+    els.apiKeyInput.value = cfg.apiKey || DEFAULT_API_KEY;
+    els.folderIdInput.value = cfg.folderId || DEFAULT_FOLDER_ID;
+    els.settingsError.hidden = true;
+    els.settingsModal.hidden = false;
+    els.apiKeyInput.focus();
+  }
+  function closeSettings(){ els.settingsModal.hidden = true; }
+
+  els.settingsBtn.addEventListener('click', openSettings);
+  els.settingsModal.addEventListener('click', (e)=>{ if(e.target === els.settingsModal) closeSettings(); });
+
+  els.saveConfigBtn.addEventListener('click', ()=>{
+    const apiKey = els.apiKeyInput.value.trim();
+    const folderId = els.folderIdInput.value.trim();
+    if(!apiKey || !folderId){
+      els.settingsError.textContent = 'Escribe la API key y el ID de la carpeta antes de guardar.';
+      els.settingsError.hidden = false;
+      return;
+    }
+    saveConfig({apiKey, folderId});
+    closeSettings();
+    loadLibrary(apiKey, folderId);
+  });
+
+  els.clearConfigBtn.addEventListener('click', ()=>{
+    clearConfig();
+    els.apiKeyInput.value = '';
+    els.folderIdInput.value = '';
+    els.settingsError.hidden = true;
+  });
+
+  els.homeBtn.addEventListener('click', closeVideo);
+  els.homeBtn.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      closeVideo();
+    }
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){ closeVideo(); closeSettings(); }
+  });
+  els.videoSidebar.addEventListener('click', (e)=>{
+    const item = e.target.closest('.sidebar-item');
+    if(!item) return;
+    const video = currentPlaylist.find(v=>v.id === item.dataset.id);
+    if(video){
+      setActiveVideo(video);
+      renderSidebar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  function closeVideo(){
+    if(els.playerView.hidden) return;
+    els.playerView.hidden = true;
+    els.libraryView.hidden = false;
+    els.videoFrame.src = '';
+  }
+  function openVideo(video, playlist){
+    currentPlaylist = playlist && playlist.length ? playlist : [video];
+    setActiveVideo(video);
+    renderSidebar();
+    els.libraryView.hidden = true;
+    els.playerView.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  function setActiveVideo(video){
+    currentVideoId = video.id;
+    els.videoFrame.src = 'https://drive.google.com/file/d/' + video.id + '/preview';
+    els.videoTitle.textContent = video.name;
+    els.videoOpenLink.href = 'https://drive.google.com/file/d/' + video.id + '/view';
+  }
+  function renderSidebar(){
+    let lastLabel;
+    const parts = [];
+    currentPlaylist.forEach(v=>{
+      const label = v.lessonName || 'General';
+      if(label !== lastLabel){
+        parts.push('<p class="sidebar-lesson-label">' + escapeHtml(label) + '</p>');
+        lastLabel = label;
+      }
+      parts.push(sidebarItemHtml(v));
+    });
+    els.videoSidebar.innerHTML = parts.join('');
+  }
+  function sidebarItemHtml(v){
+    const duration = v.videoMediaMetadata ? formatDuration(v.videoMediaMetadata.durationMillis) : '';
+    const thumb = v.thumbnailLink
+      ? '<img src="' + v.thumbnailLink + '" alt="" loading="lazy">'
+      : '<div class="sidebar-thumb-fallback" aria-hidden="true">&#9822;</div>';
+    const isActive = v.id === currentVideoId;
+    return '<button class="sidebar-item' + (isActive ? ' active' : '') + '" data-id="' + v.id + '">' +
+      '<span class="sidebar-thumb">' + thumb +
+      (duration ? '<span class="sidebar-duration">' + duration + '</span>' : '') +
+      '</span>' +
+      '<span class="sidebar-info"><span class="sidebar-title">' + escapeHtml(v.name) + '</span>' +
+      (isActive ? '<span class="sidebar-now">Reproduciendo ahora</span>' : '') +
+      '</span></button>';
+  }
+
+  function driveErrorMessage(status, body){
+    let reason = '';
+    try{ reason = body && body.error && body.error.errors && body.error.errors[0] && body.error.errors[0].reason; }catch(e){}
+    if(status === 400 || reason === 'keyInvalid' || reason === 'badRequest'){
+      return 'La API key no es válida. Revisa que la copiaste completa, sin espacios.';
+    }
+    if(reason === 'accessNotConfigured'){
+      return 'La API de Google Drive no está habilitada en el proyecto de Google Cloud de esta API key.';
+    }
+    if(status === 404){
+      return 'No se encontró la carpeta. Revisa el ID o que esté compartida como "Cualquier persona con el enlace".';
+    }
+    if(status === 403){
+      return 'Sin permiso para ver la carpeta. Compártela como "Cualquier persona con el enlace puede ver".';
+    }
+    return 'No se pudo cargar la biblioteca. Revisa tu conexión y vuelve a intentar.';
+  }
+
+  async function driveList(query, apiKey, fields){
+    const url = new URL('https://www.googleapis.com/drive/v3/files');
+    url.searchParams.set('q', query);
+    url.searchParams.set('fields', fields);
+    url.searchParams.set('pageSize', '200');
+    url.searchParams.set('orderBy', 'name');
+    url.searchParams.set('key', apiKey);
+    const res = await fetch(url.toString());
+    let body = null;
+    try{ body = await res.json(); }catch(e){}
+    if(!res.ok){
+      throw new Error(driveErrorMessage(res.status, body));
+    }
+    return (body && body.files) || [];
+  }
+
+  function formatDuration(ms){
+    if(!ms) return '';
+    const totalSec = Math.round(Number(ms)/1000);
+    const m = Math.floor(totalSec/60);
+    const s = totalSec % 60;
+    return m + ':' + String(s).padStart(2,'0');
+  }
+
+  const VIDEO_FIELDS = 'files(id,name,thumbnailLink,videoMediaMetadata,mimeType)';
+
+  async function loadLibrary(apiKey, folderId){
+    renderLoading();
+    els.tabs.hidden = true;
+    try{
+      const levelFolders = await driveList(
+        "'" + folderId + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+        apiKey, 'files(id,name)'
+      );
+      if(levelFolders.length === 0){
+        renderEmptyFolders();
+        return;
+      }
+      levelFolders.sort((a,b)=>{
+        const ai = LEVEL_ORDER.indexOf(normalize(a.name));
+        const bi = LEVEL_ORDER.indexOf(normalize(b.name));
+        const ra = ai === -1 ? LEVEL_ORDER.length : ai;
+        const rb = bi === -1 ? LEVEL_ORDER.length : bi;
+        if(ra !== rb) return ra - rb;
+        return naturalCompare(a.name, b.name);
+      });
+
+      const levels = [];
+      for(const levelFolder of levelFolders){
+        let lessons = [];
+        let directVideos = [];
+        let error = null;
+        try{
+          // Un nivel puede tener videos sueltos y/o carpetas de lección adentro.
+          const [lessonFolders, ownVideos] = await Promise.all([
+            driveList("'" + levelFolder.id + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false", apiKey, 'files(id,name)'),
+            driveList("'" + levelFolder.id + "' in parents and mimeType contains 'video/' and trashed=false", apiKey, VIDEO_FIELDS)
+          ]);
+          directVideos = ownVideos;
+          lessonFolders.sort((a,b)=>naturalCompare(a.name, b.name));
+          for(const lessonFolder of lessonFolders){
+            let videos = [];
+            try{
+              videos = await driveList(
+                "'" + lessonFolder.id + "' in parents and mimeType contains 'video/' and trashed=false",
+                apiKey, VIDEO_FIELDS
+              );
+            }catch(e){ videos = []; }
+            lessons.push({ name: lessonFolder.name, videos });
+          }
+        }catch(e){ error = e.message; }
+        const total = directVideos.length + lessons.reduce((sum, l)=>sum + l.videos.length, 0);
+        levels.push({ name: levelFolder.name, key: normalize(levelFolder.name), lessons, directVideos, error, total });
+      }
+      state.levels = levels;
+      state.activeIndex = 0;
+      renderTabs();
+      renderActiveLevel();
+    }catch(e){
+      renderError(e.message);
+    }
+  }
+
+  function renderLoading(){
+    els.content.innerHTML = '<div class="state-msg"><p>Cargando la biblioteca&hellip;</p></div>';
+  }
+  function renderError(msg){
+    els.content.innerHTML =
+      '<div class="state-msg state-error"><p>' + escapeHtml(msg) + '</p>' +
+      '<button class="btn-primary" id="retryBtn">Reintentar</button></div>';
+    document.getElementById('retryBtn').addEventListener('click', ()=>{
+      const cfg = loadConfig();
+      if(cfg) loadLibrary(cfg.apiKey, cfg.folderId);
+    });
+  }
+  function renderEmptyFolders(){
+    els.content.innerHTML =
+      '<div class="state-msg"><p>La carpeta no tiene subcarpetas todavía. Crea carpetas como "Principiante", "Intermedio" y "Avanzado" adentro; dentro de cada una puedes tener carpetas de lección con sus videos, o subir los videos directo.</p></div>';
+  }
+  function renderConfigPrompt(){
+    els.tabs.hidden = true;
+    els.content.innerHTML =
+      '<div class="state-msg state-onboard"><p>Todavía no hay una carpeta configurada. Revisa que DEFAULT_API_KEY y DEFAULT_FOLDER_ID estén puestos en el código.</p></div>';
+  }
+
+  function renderTabs(){
+    els.tabs.hidden = false;
+    els.tabs.innerHTML = state.levels.map((lvl, i)=>{
+      const icon = LEVEL_ICONS[lvl.key] || '\u265F';
+      return '<button class="level-tab ' + (i === state.activeIndex ? 'active' : '') + '" data-index="' + i + '">' +
+        '<span class="level-icon" aria-hidden="true">' + icon + '</span>' +
+        '<span>' + escapeHtml(lvl.name) + '</span>' +
+        '<span class="level-count">' + lvl.total + '</span></button>';
+    }).join('');
+    els.tabs.querySelectorAll('.level-tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.activeIndex = Number(btn.dataset.index);
+        renderTabs();
+        renderActiveLevel();
+      });
+    });
+  }
+
+  function renderActiveLevel(){
+    const lvl = state.levels[state.activeIndex];
+    if(!lvl){ els.content.innerHTML = ''; return; }
+    if(lvl.error){
+      els.content.innerHTML = '<div class="state-msg state-error"><p>' + escapeHtml(lvl.error) + '</p></div>';
+      return;
+    }
+    if(lvl.total === 0){
+      els.content.innerHTML = '<div class="state-msg"><p>Aún no hay videos en "' + escapeHtml(lvl.name) + '".</p></div>';
+      return;
+    }
+
+    let html = '';
+    if(lvl.directVideos.length){
+      if(lvl.lessons.length){
+        html += '<section class="lesson-section"><h2 class="lesson-title">General</h2><div class="video-grid">' +
+          lvl.directVideos.map(videoCardHtml).join('') + '</div></section>';
+      }else{
+        html += '<div class="video-grid">' + lvl.directVideos.map(videoCardHtml).join('') + '</div>';
+      }
+    }
+    lvl.lessons.forEach(lesson=>{
+      html += '<section class="lesson-section"><h2 class="lesson-title">' + escapeHtml(lesson.name) + '</h2>';
+      html += lesson.videos.length
+        ? '<div class="video-grid">' + lesson.videos.map(videoCardHtml).join('') + '</div>'
+        : '<p class="lesson-empty">Sin videos todavía.</p>';
+      html += '</section>';
+    });
+    els.content.innerHTML = html;
+
+    els.content.querySelectorAll('.video-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        const flat = getCurrentLevelFlatVideos();
+        const video = flat.find(v=>v.id === card.dataset.id);
+        if(video) openVideo(video, flat);
+      });
+    });
+  }
+
+  function getCurrentLevelFlatVideos(){
+    const lvl = state.levels[state.activeIndex];
+    if(!lvl) return [];
+    const flat = [];
+    lvl.directVideos.forEach(v=> flat.push(Object.assign({ lessonName: null }, v)));
+    lvl.lessons.forEach(lesson=>{
+      lesson.videos.forEach(v=> flat.push(Object.assign({ lessonName: lesson.name }, v)));
+    });
+    return flat;
+  }
+
+  function videoCardHtml(v){
+    const duration = v.videoMediaMetadata ? formatDuration(v.videoMediaMetadata.durationMillis) : '';
+    const thumb = v.thumbnailLink
+      ? '<img src="' + v.thumbnailLink + '" alt="" loading="lazy">'
+      : '<div class="thumb-fallback" aria-hidden="true">&#9822;</div>';
+    return '<button class="video-card" data-id="' + v.id + '" data-title="' + escapeHtml(v.name) + '">' +
+      '<span class="thumb-wrap">' + thumb +
+      '<span class="play-badge" aria-hidden="true"></span>' +
+      (duration ? '<span class="duration-badge">' + duration + '</span>' : '') +
+      '</span>' +
+      '<span class="video-title">' + escapeHtml(v.name) + '</span></button>';
+  }
+
+  const cfg = loadConfig();
+  const initApiKey = (cfg && cfg.apiKey) || DEFAULT_API_KEY;
+  const initFolderId = (cfg && cfg.folderId) || DEFAULT_FOLDER_ID;
+  if(initApiKey && initFolderId){
+    loadLibrary(initApiKey, initFolderId);
+  }else{
+    renderConfigPrompt();
+  }
+})();
+</script>
+</body>
+</html>
